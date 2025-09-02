@@ -103,6 +103,9 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+## Data Example
+![Pipeline overview](docs/container_runtime_example.png)
+
 
 ## Modeling Guidance
 - After collecting measurements for a container, fit a simple parametric or piecewise model (e.g., least squares) for latency as a function of resources and input size, and report goodness of fit and residuals. Keep train/test splits separate for each container–task pair.

@@ -1,10 +1,13 @@
-# ML Container Runtime Profiling Dataset
-> Reproducible measurements of cold starts and runtime behavior for ML containers across resource limits and input scales on the edge–cloud continuum.
+# AI Services Container Runtime Profiling Dataset
+> Reproducible measurements of the invocation latency of AI Services Docker Containers, including cold starts and runtime behavior, under various resource specifications and input scales.
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)](#continuous-integration) [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](#requirements) [![Issues](https://img.shields.io/github/issues/<ORG_OR_USER>/<REPO>.svg)](https://github.com/<ORG_OR_USER>/<REPO>/issues)
 
 ## Overview
-This repository provides a dataset and scripts for systematically profiling containerized ML workloads. It focuses on two critical aspects for scheduling and resource management: multi-second cold starts during model load and warm-up, and nonlinear runtime behavior under changing CPU, GPU, and memory limits as well as varying input sizes. The dataset is designed to support reproducible performance modeling and quantitative evaluation of scheduling and resource allocation strategies.
+This repository provides 
+1. A dataset of latency measurements for popular AI service containers (with deep models at the core)
+2. Scripts for systematically profiling containerized ML workloads. 
+We focus on two critical aspects for scheduling and resource management: container cold start and nonlinear runtime behavior under varid CPU, GPU, and memory specs as well as input sizes. The dataset is designed to support reproducible performance modeling and quantitative evaluation of scheduling and resource allocation strategies.
 
 ## What’s Included
 - **Static metrics**: container image size, model weights size (download volume).
@@ -29,6 +32,11 @@ This dataset is collected with reference to the **APIBench** dataset methodology
 - Memory limits: `{2 GB, 4 GB, 8 GB, 16 GB}`  
 - GPU count: `{0, 1}`  
 - Input scaling: task-specific multi-level inputs (e.g., image resolution or text length grid)
+
+## Data Example
+![runtime profile example](docs/container_runtime_example.png)
+
+# Guideline for Customized Profiling
 
 ## Requirements
 - Python 3.9 or newer
@@ -103,8 +111,6 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-## Data Example
-![Pipeline overview](docs/container_runtime_example.png)
 
 
 ## Modeling Guidance
@@ -114,13 +120,18 @@ if __name__ == "__main__":
 ## Contributing
 Contributions are welcome. Please open an issue to discuss your idea before submitting a pull request. Follow the code style and ensure tests pass. See `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` if present.
 
-
-
 ## License
 This project is released under the MIT license. See [LICENSE](LICENSE) for details.
 
 ## Acknowledgements
-We thank the maintainers of the open source libraries and datasets used in this project. If you have funding or institutional support, acknowledge it here.
+This dataset is part of the DOR project (https://github.com/wingter562/DISTINT_open_data) by Dr. Wentai Wu, Jinan University, with primary contribution by Dr. Shenghai Li, South China University of Technology.
 
-## Contact
-Maintainer: <Your Name> <your.email@example.com> • Issues and feature requests: please open a GitHub Issue
+List of all contributors:
+- Wentai Wu, JNU
+- Shenghai Li, SCUT
+- Kaizhe Song, JNU
+- Qinan Wu, JNU
+
+Project contact: wentaiwu[at]jnu[dot]edu[dot]cn | lishenghai2022[at]foxmail[dot]com
+
+Issues and feature requests: please open a GitHub Issue

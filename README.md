@@ -10,8 +10,8 @@ This repository provides
 We focus on two critical aspects for scheduling and resource management: container cold start and nonlinear runtime behavior under varid CPU, GPU, and memory specs as well as input sizes. The dataset is designed to support reproducible performance modeling and quantitative evaluation of scheduling and resource allocation strategies.
 
 ## What’s Included
-- **Static metrics**: container image size, model weights size (download volume).
-- **Dynamic metrics**: cold-start latency (image download + container startup), end-to-end runtime under a matrix of resource limits and input scales.
+- **Static metrics**: container image and model weights size (download volume).
+- **Dynamic metrics**: end-to-end runtime measured under a specified matrix of CPU/GPU/memory limits and input scales.
 - **Optional metrics**: peak CPU usage, peak GPU utilization or VRAM usage.
 - **Scripts**: Docker build/run recipes with resource caps, client scripts for warm-up and request timing, CSV logging, and plotting utilities.
 

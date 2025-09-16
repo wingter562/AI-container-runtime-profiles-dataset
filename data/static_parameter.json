@@ -1,0 +1,12 @@
+{
+  "MiDas_Small": { "image_size": "113.81 MB" },
+  "MiDas_Large": { "image_size": "1315.18 MB" },
+  "MiDas_Hybrid": { "image_size": "469.93 MB" },
+  "fcn_resnet50": { "image_size": "156 MB" },
+  "fcn_resnet101": { "image_size": "208 MB" },
+  "vgg11": { "image_size": "507 MB" },
+  "vgg13": { "image_size": "508 MB" },
+  "vgg16": { "image_size": "528 MB" },
+  "vgg19": { "image_size": "548 MB" },
+  "silero": { "image_size": "11 GB" }
+}

@@ -8,5 +8,7 @@
   "vgg13": { "download volume": "508 MB" },
   "vgg16": { "download volume": "528 MB" },
   "vgg19": { "download volume": "548 MB" },
-  "silero": { "download volume": "11 GB" }
+  "silero": { "download volume": "11 GB" },
+  "gcn": { "download volume": "5.93 GB" },
+  "rgcn": { "download volume": "5.93 GB" }
 }

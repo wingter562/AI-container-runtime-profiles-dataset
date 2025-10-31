@@ -48,8 +48,8 @@ This dataset is collected with reference to the **APIBench** dataset methodology
 - Runtime metrics: per-request end-to-end latency under each CPU/MEM/GPU/input configuration.
 - Optional peaks: peak CPU usage, peak GPU utilization/VRAM.
 
-## Quick Start A example container(Fcn50)
-1) Model pre-download script (download_model.py)
+## Quick Start Tutorial: profiling FCN-50
+#### 1) Model Download (download_model.py)
 ```bash
 import os
 import torch
@@ -73,7 +73,7 @@ model = torch.hub.load(repo_or_dir=MODEL_REPO, model=MODEL_NAME, pretrained=PRET
 print(f"Model pre-download complete, storage path: {TORCH_HOME}")
 ```
 
-2) Building a simple server code（server.py）
+#### 2) Write inference service code（server.py）
 ```bash
 import requests
 import numpy as np
@@ -171,7 +171,7 @@ try:
 except Exception as e:
     print("Request exception:", str(e))
 ```
-3)Dockerfile
+#### 3) Compose the Dockerfile
 ```bash
 FROM python:3.10-slim
 
@@ -194,7 +194,7 @@ EXPOSE 8006
 CMD ["python", "server.py"]
 ```
 
-4)Deploying containers with different resource budgets
+#### 4) Deploy containers with specified resource budgets
 ```bash
 sudo docker run --gpus all -d -p 9001:8006 --cpus="8.0" --memory="16g" --name fcn_resnet50_gpu torchhub_fcn_resnet50_server
 sudo docker run -d -p 9002:8006 --cpus="6.0" --memory="12g" --name fcn50_cpu6 torchhub_fcn_resnet50_server
@@ -204,7 +204,7 @@ sudo docker run -d -p 9005:8006 --cpus="2.0" --memory="4g" --name fcn50_cpu2 tor
 sudo docker run -d -p 9006:8006 --cpus="1.0" --memory="2g" --name fcn50_cpu1 torchhub_fcn_resnet50_server
 ```
 
-5）Metrics collection code (setting different input images can collect runtime metrics under different input sizes)
+#### 5）Metrics collection code (setting different input images can collect runtime metrics given different input sizes)
 ```bash
 import requests
 import numpy as np
@@ -338,8 +338,8 @@ if __name__ == '__main__':
 - After collecting measurements for a container, fit a simple parametric or piecewise model (e.g., least squares) for latency as a function of resources and input size, and report goodness of fit and residuals. Keep train/test splits separate for each container–task pair.
 
 
-## Contributing
-Contributions are welcome. Please open an issue to discuss your idea before submitting a pull request. Follow the code style and ensure tests pass. See `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` if present.
+## Contribution
+New contributors are welcome. Please open an issue to discuss your idea before submitting a pull request. Follow the code style and ensure tests pass. See `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` if present.
 
 ## License
 This project is released under the MIT license. See [LICENSE](LICENSE) for details.
@@ -347,11 +347,12 @@ This project is released under the MIT license. See [LICENSE](LICENSE) for detai
 ## Acknowledgements
 This dataset is part of the DOR project (https://github.com/wingter562/DISTINT_open_data) by Dr. Wentai Wu, Jinan University, with primary contribution by Dr. Shenghai Li, South China University of Technology.
 
-List of all contributors:
+**List of contributors:**
 - Wentai Wu, JNU
 - Shenghai Li, SCUT
 - Kaizhe Song, JNU
 - Qinan Wu, JNU
+- Yukai Wang, JNU
 
 Project contact: wentaiwu[at]jnu[dot]edu[dot]cn | lishenghai2022[at]foxmail[dot]com
 

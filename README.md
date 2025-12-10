@@ -311,8 +311,7 @@ if __name__ == '__main__':
 
 
 ## Contribution
-New contributors are welcome. Please open an issue to discuss your idea before submitting a pull request. Follow the code style and ensure tests pass. See `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` if present.
-
+New contributors are welcome. Please open an issue to discuss your idea before submitting a pull request. Follow the code style and ensure tests pass. 
 ## License
 This project is released under the Apache-2.0 License. See [LICENSE](LICENSE) for details.
 

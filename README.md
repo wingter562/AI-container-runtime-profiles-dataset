@@ -314,7 +314,7 @@ if __name__ == '__main__':
 New contributors are welcome. Please open an issue to discuss your idea before submitting a pull request. Follow the code style and ensure tests pass. See `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` if present.
 
 ## License
-This project is released under the MIT license. See [LICENSE](LICENSE) for details.
+This project is released under the Apache-2.0 License. See [LICENSE](LICENSE) for details.
 
 ## Acknowledgements
 This dataset is part of the DOR project (https://github.com/wingter562/DISTINT_open_data) by Dr. Wentai Wu, Jinan University, with primary contribution by Dr. Shenghai Li, South China University of Technology.

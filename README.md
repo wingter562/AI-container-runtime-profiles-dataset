@@ -75,101 +75,73 @@ print(f"Model pre-download complete, storage path: {TORCH_HOME}")
 
 #### 2) Write inference service code（server.py）
 ```bash
-import requests
-import numpy as np
-import cv2
 import torch
-from PIL import Image
-from torchvision import transforms
-import json
-import matplotlib.pyplot as plt
+import numpy as np
+import traceback
+from flask import Flask, request, jsonify
+import os
+import torchvision.models as models
 
-# ---------------------------
-# Load local image and convert to RGB
-# ---------------------------
-image_path = "/home/lishenghai/桌面/tool_set/MiDas_Hybrid/flower.jpg"  # Change to your local image path
-input_image = Image.open(image_path).convert("RGB")
+app = Flask(__name__)
 
-# ---------------------------
-# Define the preprocessing pipeline (based on official sample code)
-# ---------------------------
-# Official sample code uses the following preprocessing:
-#   transforms.ToTensor()
-#   transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-preprocess = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                         std=[0.229, 0.224, 0.225])
-])
+# ===================== 🔥 加载 FCN-ResNet50 模型 =====================
+print("🚀 正在加载 FCN-ResNet50 模型...")
+os.environ["TORCH_HOME"] = "/opt/torch_hub/"
+torch.hub.set_dir("/opt/torch_hub/")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Apply preprocessing, convert image to tensor
-input_tensor = preprocess(input_image)
-# Add batch dimension, resulting shape (1, 3, H, W)
-input_batch = input_tensor.unsqueeze(0)
+# 加载预训练的 FCN-ResNet50 分割模型
+model = models.segmentation.fcn_resnet50(pretrained=True)
+model.to(device).eval()
+print("✅ 模型加载完成！")
 
-# If a fixed size is needed, e.g., FCN-ResNet50 requires (1, 3, 224, 224), you can resize (resize is not forced here)
-# input_batch = torch.nn.functional.interpolate(input_batch, size=(224, 224), mode='bicubic', align_corners=False)
+# ===================== 🔥 API 接口 =====================
+@app.route("/predict", methods=["POST"])
+def predict():
+    try:
+        print("📥 收到张量处理请求...")
 
-# ---------------------------
-# Construct JSON Payload
-# ---------------------------
-# Convert the input tensor to a NumPy array, then to a list for JSON serialization
-payload = {"tensor": input_batch.cpu().numpy().tolist()}
+        # 解析 JSON 数据
+        data = request.get_json()
+        if data is None or "tensor" not in data:
+            print("❌ 请求数据格式错误")
+            return jsonify({"error": "请提供 'tensor' 字段，表示输入图像的张量"}), 400
 
-headers = {
-    "Content-Type": "application/json",
-    "Connection": "close",    # Force close connection, avoid issues with Keep-Alive
-    "Expect": ""              # Disable Expect: 100-continue
-}
-# Explicitly disable proxies: pass an empty proxy dictionary
-proxies = {
-    "http": "",
-    "https": ""
-}
+        # 将 JSON 中的 'tensor' 转换为 NumPy 数组，并转为 torch.Tensor
+        try:
+            input_array = np.array(data["tensor"], dtype=np.float32)
+            input_tensor = torch.tensor(input_array, dtype=torch.float32).to(device)
+        except Exception as e:
+            print("❌ 'tensor' 解析失败:", str(e))
+            return jsonify({"error": "无效的 'tensor' 格式"}), 400
 
-# ---------------------------
-# Define API service address (modify based on your deployment)
-# ---------------------------
-api_url = "http://localhost:8006/predict"
+        # 检查输入张量形状是否为 (1, 3, H, W)，H 和 W 可变
+        if input_tensor.ndim != 4 or input_tensor.shape[0] != 1 or input_tensor.shape[1] != 3:
+            print(f"❌ 输入张量形状错误: {input_tensor.shape}")
+            return jsonify({"error": "输入张量形状错误，期望形状为 (1, 3, H, W)"}), 400
 
-# ---------------------------
-# Send POST request and process the output
-# ---------------------------
-try:
-    response = requests.post(api_url, json=payload, headers=headers, proxies=proxies, timeout=60)
-    print("Status Code:", response.status_code)
+        print(f"✅ 接收张量，形状: {input_tensor.shape}")
+
+        # 进行模型推理
+        with torch.no_grad():
+            # 模型返回一个字典，"out" 是分割结果
+            output = model(input_tensor)["out"][0]
+
+        # 生成分割结果（取每个像素的类别索引）
+        output_predictions = output.argmax(0).cpu().numpy()
+        print("✅ 预测完成，返回结果！")
+        return jsonify({"segmentation": output_predictions.tolist()})
     
-    if response.status_code == 200:
-        result = response.json()
-        # Assume the server returns the field "segmentation", i.e., the class index map for each pixel
-        segmentation_map = np.array(result["segmentation"])
-        print("Prediction successful! Shape of segmentation result:", segmentation_map.shape)
-        
-        # ---------------------------
-        # Process output as per official example: generate pseudo-color image
-        # ---------------------------
-        # Construct palette: Assume the model segments into 21 classes
-        palette = torch.tensor([2**25 - 1, 2**15 - 1, 2**21 - 1])
-        colors = torch.as_tensor([i for i in range(21)])[:, None] * palette
-        colors = (colors % 255).numpy().astype("uint8")
-        
-        # Convert segmentation result to PIL Image, Note: segmentation_map should be a 2D array
-        seg_img = Image.fromarray(segmentation_map.astype(np.uint8))
-        # Resize to original image size for display
-        seg_img = seg_img.resize(input_image.size)
-        # Apply palette
-        seg_img.putpalette(colors.flatten().tolist())
-        
-        # Use matplotlib to display pseudo-color segmentation result
-        plt.figure(figsize=(8, 6))
-        plt.imshow(seg_img)
-        plt.title("Segmentation Result")
-        plt.axis("off")
-        plt.show()
-    else:
-        print("Request failed, response content:", response.text)
-except Exception as e:
-    print("Request exception:", str(e))
+    except Exception as e:
+        print("❌ 服务器处理异常:", str(e))
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+# ===================== 🚀 启动 Flask 服务器 =====================
+if __name__ == '__main__':
+    print("🌍 服务器启动中...")
+    app.run(host="0.0.0.0", port=8006, threaded=True)
+
 ```
 #### 3) Compose the Dockerfile
 ```bash

@@ -1,13 +1,64 @@
-# AI Model Container Runtime Profiling (AC-Prof) Dataset
-> Reproducible measurements of the invocation latency of AI Services Docker Containers, including cold starts and runtime behavior, under various resource specifications and input scales.
+# AC-Prof: AI Model Container Runtime Profiling Dataset & Framework
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE) [![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)](#continuous-integration) [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](#requirements) [![Issues](https://img.shields.io/github/issues/<ORG_OR_USER>/<REPO>.svg)](https://github.com/<ORG_OR_USER>/<REPO>/issues)
+> **A high-fidelity dataset and reproducible profiling framework for characterizing the comprehensive runtime metrics of containerized AI microservices under constrained resource specifications.**
 
-## Overview
-This repository provides 
-1. A dataset of latency measurements for popular AI service containers (with deep models at the core)
-2. Scripts for systematically profiling containerized ML workloads. 
-We focus on two critical aspects for scheduling and resource management: container cold start and nonlinear runtime behavior under varid CPU, GPU, and memory specs as well as input sizes. The dataset is designed to support reproducible performance modeling and quantitative evaluation of scheduling and resource allocation strategies.
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE) [![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)](#continuous-integration) [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](#requirements) 
+
+
+---
+
+## 📖 Overview
+
+**AC-Prof (AI Container Profiler)** addresses the critical lack of fine-grained performance data for AI workloads in edge and serverless computing environments. Unlike general-purpose monitoring tools, AC-Prof is specifically architected for Deep Learning (DL) inference services.
+
+It provides **two core assets** for the research community:
+1.  **The Dataset**: A comprehensive collection of performance metrics covering cold-starts and runtime behaviors under rigorous resource limits (CPU/GPU/Memory) and input variations.
+2.  **The Framework**: A decoupled, side-channel profiling tool that captures **Network Latency** (via packet sniffing) and **GPU Energy** (via NVML integration) with **zero code intrusion**.
+
+## 🌟 Key Features
+
+* **🕵️ Zero-Intrusion Architecture**: Utilizes **Side-Channel Monitoring** (Network Sniffers & GPU Polling) to profile containers without modifying a single line of the model server code.
+* **🧩 Modularity & Extensibility**: Features a plugin-based monitor architecture. Switch effortlessly between `LatencyProxy` (Application-level) and `NetworkSniffer` (Network-level) modes.
+* **📦 Reproducible Environments**: Fully containerized benchmarks based on standard Docker runtimes and PyTorch Hub models, ensuring consistent results across different hardware.
+
+## 🏗️ System Architecture
+
+The framework adopts a strict Control-Execution-Monitor separation principle to facilitate modular extensibility and reproducible orchestration.
+
+
+
+| Component | Responsibility |
+| :--- | :--- |
+| **Controller** | Orchestrates the experiment workflow (Warm-up $\rightarrow$ Input Scaling $\rightarrow$ Batch Loop $\rightarrow$ Cool-down). |
+| **Client** | Generates workloads and handles data serialization. Supports variable input scales (e.g., image resolution). |
+| **Server** | The black-box AI container (Flask/TorchServe) executing the inference logic. |
+| **Monitor** | **Side-channel Collector**: <br>1. **Sniffer**: Captures TCP packets on `docker0` bridge to measure physical transport latency. <br>2. **Energy**: Polls NVIDIA NVML at 20Hz to integrate total GPU power usage. |
+
+## 📊 Dataset Specifications
+
+We perform a comprehensive sweep across multiple resource dimensions to construct the dataset.
+
+### Resource Matrix
+| Dimension | Configuration Space |
+| :--- | :--- |
+| **Compute (CPU)** | 1, 2, 4, 8 vCPUs |
+| **Memory Caps** | 2 GB, 4 GB, 8 GB, 16 GB |
+| **Accelerator** | NVIDIA GeForce RTX 3090 (ON / OFF) |
+| **Input Scaling** | $0.1\times$ to $2.0\times$ resolution (20 data points per model) |
+
+### Collected Metrics
+* **End-to-End Latency**: P50, P95, and P99 tail latency (seconds).
+* **Energy Consumption**: Total GPU energy per inference (Joules).
+* **Power Draw**: Average and Peak GPU board power (Watts).
+* **Static Meta**: Model weight size, Docker image download volume.
+
+## 📈 Benchmark Results (Preview)
+
+*The following plots demonstrate the non-linear relationship between input scale, latency, and energy consumption captured by AC-Prof.*
+
+![Latency-Energy Tradeoff](docs/container_runtime_example.png)
+*(Figure: FCN-ResNet50 performance profile on RTX 3090. Note the linear power consumption vs. non-linear energy accumulation.)*
+
 
 ## What’s Included
 - **Static metrics**: container image and model weights size (download volume).

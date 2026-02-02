@@ -1,0 +1,2 @@
+model_name,model_download_url,snapshot_path,model_weight_bytes,model_weight_mb,docker_image_download_volume_mb
+/root/autodl-tmp/jina_resource_matrix/models/jina-embeddings-v3,https://huggingface.co/jinaai/jina-embeddings-v3,/root/autodl-tmp/jina_resource_matrix/models/jina-embeddings-v3,5747747209,5481.479,NA (non-containerized)

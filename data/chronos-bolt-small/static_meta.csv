@@ -1,0 +1,2 @@
+model_name,	model_download_url,model_weight_bytes,docker_image_bytes
+chronos-bolt-small,https://huggingface.co/autogluon/chronos-bolt-small,190888824,6385660391

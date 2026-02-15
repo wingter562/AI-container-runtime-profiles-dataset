@@ -1,0 +1,2 @@
+model_name,model_download_url,model_weight_bytes,docker_image_bytes
+amazon/chronos-2,https://huggingface.co/amazon/chronos-2,477940228,4400586898

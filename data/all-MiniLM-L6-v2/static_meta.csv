@@ -1,0 +1,2 @@
+model_name,model_download_url,gpu,model_weight_bytes,docker_image_bytes
+all-MiniLM-L6-v2,https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2, GeForce RTX 3080,91601385,4415918499
